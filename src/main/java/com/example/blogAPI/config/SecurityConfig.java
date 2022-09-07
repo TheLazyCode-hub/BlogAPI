@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.example.blogAPI.security.CustomUserDetailsService;
 import com.example.blogAPI.security.JWTAuthenticationEntryPoint;
@@ -22,6 +23,7 @@ import com.example.blogAPI.security.JWTAuthenticationFilter;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableWebMvc
 public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	
 	@Autowired
@@ -31,12 +33,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	@Autowired
 	JWTAuthenticationFilter jwtAuthenticationFilter;
 	
+	private static final String[] PUBLIC_URL = {
+		"/api/auth/**",
+		"/v3/api-docs",
+		"/swagger-resources/**",
+		"/swagger-ui/**",
+		"/webjars/**",
+		"/v2/api-docs"
+	};
+	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.
 		csrf().disable()
 		.authorizeHttpRequests()
-		.antMatchers("/api/auth/**").permitAll()
+		.antMatchers(PUBLIC_URL).permitAll()
 		.anyRequest().authenticated()
 		.and()
 		.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
